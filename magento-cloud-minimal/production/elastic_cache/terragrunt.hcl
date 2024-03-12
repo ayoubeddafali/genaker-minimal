@@ -3,7 +3,7 @@ locals {
 }
 
 terraform {
-  source = "git::git@github.com:cloudposse/terraform-aws-elasticache-redis.git"
+  source = "git::git@github.com:cloudposse/terraform-aws-elasticache-redis.git?ref=0.51.1"
 }
 
 include {
@@ -52,12 +52,14 @@ inputs = {
   #cluster_size = 1
   #family = "redis6.x"
   #engine_version = "6.x"
-  instance_type = "cache.m3.medium"
+  instance_type = "cache.t3.medium"
   
   # Apply changes immediately	
   apply_immediately = true
   
   # Whether to enable encryption in transit. If this is enabled, use the following guide to access redis
   transit_encryption_enabled = false
-  security_groups = [dependency.redis_security.outputs.security_group_id]
+  create_security_group = false
+  # security_groups = [dependency.redis_security.outputs.security_group_id]
+  associated_security_group_ids = [dependency.redis_security.outputs.security_group_id]
 }
