@@ -55,7 +55,7 @@ inputs = {
 
   # The engine version to use
   # type: string
-  engine_version = "10.4.13"
+  engine_version = "10.4.32"
 
   # The family of the DB parameter group
   # type: string
