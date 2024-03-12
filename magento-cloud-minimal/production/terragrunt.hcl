@@ -36,6 +36,7 @@ generate "main_providers" {
   contents  = <<EOF
 provider "aws" {
   region = "${local.aws_region}"
+  version = "4.67.0"
 
   # Make it faster by skipping something
   skip_get_ec2_platforms      = true
