@@ -1,67 +1,67 @@
 # Minimal Magento Cloud Infrastructure 
 
-![Minimal Magento Cloud Infrastructure](https://user-images.githubusercontent.com/9213670/134857584-7771a2ec-73d1-45d0-858f-d628c13e21b9.png)
-
-![Minimal Magento Infrastructure](https://user-images.githubusercontent.com/9213670/134946003-ccb34672-871e-456c-885f-4d16b0781286.png)
-
 ![Minimal Magento Terraform](https://user-images.githubusercontent.com/9213670/134946402-8a4ff61d-5def-448a-83dd-89eadecaa550.png)
 
+## Pre-requis
 
-## Quick start
+1. Terraform
+2. Terragrunt
 
-1. [Install Terraform 0.15 or newer](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-1. [Install Terragrunt 0.29 or newer](https://terragrunt.gruntwork.io/docs/getting-started/install/)
-1. Optionally, [install pre-commit hooks](https://pre-commit.com/#install) to keep Terraform formatting and documentation up-to-date.
+Pour installer les version adéquates, lancer le script install-terraform.sh sur votre machine locale.
 
-If you are using macOS you can install all dependencies using [Homebrew](https://brew.sh/):
+## Configuration d'accés au compte AWS
+
+A partir de la console, exporter les cles d'APIS, et configurer les variables d'environments suivantes :
 ```
-    $ brew install terraform terragrunt pre-commit
-```
-## Configure access to AWS account
-
-The recommended way to configure access credentials to AWS account is using environment variables:
-
-```
-$ export AWS_DEFAULT_REGION=ap-southeast-1
+$ export AWS_DEFAULT_REGION=us-east-2
 $ export AWS_ACCESS_KEY_ID=...
 $ export AWS_SECRET_ACCESS_KEY=...
 ```
 
-Alternatively, you can edit `terragrunt.hcl` and use another authentication mechanism as described in [AWS provider documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication).
 
-## Create and manage your infrastructure
+## Déploiement d'infrastructure
 
-Infrastructure consists of multiple layers (magento_auto_scaling, mysql, load_balancer, ...) where each layer is described using one [Terraform module](https://www.terraform.io/docs/configuration/modules.html) with `inputs` arguments specified in `terragrunt.hcl` in respective layer's directory.
-
-Navigate through layers to review and customize values inside `inputs` block.
-
-There are two ways to manage infrastructure (slower&complete, or faster&granular):
-- **Region as a whole (slower&complete).** Run this command to create infrastructure in all layers in a single region:
+Pour déployer l'infrastructure minimale de Genaker, il suffit de lancer :
 
 ```
-$ cd region
+$ cd magento-cloud-minimal/production
 $ terragrunt run-all apply
 ```
 
-- **As a single layer (faster&granular).** Run this command to create infrastructure in a single layer (eg, `magento_auto_scaling`):
+Aprés confirmation, l'infra doit etre prete dans 5 minutes max.
+Vous ne devez pas avoir de problémes de terraform/modules si vous utiliser la branche minimale, et les pre-requies.
 
-```
-$ cd ap-southeast-1/magento_auto_scaling
-$ terragrunt apply
-```
 
-After the confirmation your infrastructure should be created.
+## Supressions de l'infrastructure
 
-## Destroy/Delete infrastructure
-
-**destroy-all** (DEPRECATED: use run-all)
-DEPRECATED: Use **run-all destroy** instead.
 
 ```
  terragrunt run-all destroy
 ```
 
-Destroy a ‘stack’ by running ‘terragrunt destroy’ in each subfolder.
+## Configuration de magento
+
+Pour configurer magento sur les VMs créer, vous pouvez suivre le script `install-magento.sh`.
+
+Le script fait les actions suivantes: 
+
+- Lignes 6 -> 11 : Installation du php8.2 et ses modules
+- Lignes 15 -> 18 :Installation de composer
+- Lignes 20 -> 22 :Installation de Nginx
+- Lignes 24 -> 26 :Installer des utilitaires : le client de mysql et redis pour tester la connexion en ligne de commande
+- Lignes 28 -> 31 :Configuration de php-fpm pour utiliser l'utilisateur nginx au lieu du apache
+- Lignes 33 -> 38 :Installation du OpenMage
+- Lignes 47 -> 81 :Configuration de nginx pour magento 1
+- Lignes 87 -> 100 :Installation du sample data
+- Lignes 101 -> 106 :Permissions
+- Lignes 108 -> 111 : Redémarrage du service
+
+
+Noter la présence de la variable DB_HOST, cette variable doit etre modifiée avant la configuration de magento. Vous devez changer la valeur de la variable par celle presente lorsque vous visiter AWS Console -> RDS, et vous cliquer sur la base crée par terraform, et vous inspecter les details pour avoir le host.
+
+## Test 
+
+Une fois le script est terminé, vous devez etre capable a accéder à l'instance de Magento à partir de l'IP public de la VM.
 
 ## References
 
