@@ -22,10 +22,12 @@ inputs = {
   # List of IPv4 CIDR ranges to use on all ingress rules
   # type: list(string)
   ingress_cidr_blocks = ["0.0.0.0/0"]
+  egress_cidr_blocks = ["0.0.0.0/0"]
 
   # List of ingress rules to create by name
   # type: list(string)
   ingress_rules = ["all-all"]
+  egress_rules = ["all-all"]
 
   # Name of security group
   # type: string
